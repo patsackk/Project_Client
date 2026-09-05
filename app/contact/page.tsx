@@ -54,7 +54,7 @@ export default function ContactPage() {
       setFormData({ name: '', phone: '', email: '', message: '' });
     } catch (error) {
       console.error(error);
-      alert('Something went wrong. Please try again.');
+      alert('Something went wrong. Please try again');
     }
   };
 
