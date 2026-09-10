@@ -2,6 +2,7 @@
 
 import { useState, ChangeEvent, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 type RegisterFormData = {
   name: string;
@@ -22,6 +23,7 @@ export default function RegisterPage() {
 
   const [message, setMessage] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [agreedToPolicy, setAgreedToPolicy] = useState<boolean>(false);
 
   const router = useRouter();
 
@@ -36,6 +38,12 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (!agreedToPolicy) {
+      setMessage('You must agree to the Terms of Service and PDPA Privacy Notice to continue.');
+      return;
+    }
+
     setIsLoading(true);
     setMessage('');
 
@@ -57,6 +65,7 @@ export default function RegisterPage() {
               address: '',
               password: '',
             });
+        setAgreedToPolicy(false);
       } else {
         setMessage(data.message || 'Registration failed.');
       }
@@ -181,11 +190,31 @@ export default function RegisterPage() {
           />
         </div>
 
+        {/* PDPA / Terms consent */}
+        <div className="flex items-start gap-2 pt-1">
+          <input
+            type="checkbox"
+            id="agreedToPolicy"
+            name="agreedToPolicy"
+            checked={agreedToPolicy}
+            onChange={(e) => setAgreedToPolicy(e.target.checked)}
+            required
+            className="mt-0.5 h-4 w-4 rounded border-gray-300 text-sky-600 focus:ring-sky-500"
+          />
+          <label htmlFor="agreedToPolicy" className="text-xs text-gray-600 leading-relaxed">
+            I have read and agree to the{' '}
+            <Link href="/pdpa" target="_blank" className="text-sky-700 underline hover:text-sky-800">
+              Terms of Service and PDPA Privacy Notice
+            </Link>
+            .
+          </label>
+        </div>
+
         {/* Buttons */}
         <div className="flex flex-col gap-3 pt-2">
           <button
             type="submit"
-            disabled={isLoading}
+            disabled={isLoading || !agreedToPolicy}
             className="w-full rounded-full bg-gradient-to-r from-sky-600 to-sky-800 py-3 text-white text-sm font-semibold shadow hover:opacity-90 transition disabled:opacity-60"
           >
             {isLoading ? 'Signing up...' : 'Sign Up'}
