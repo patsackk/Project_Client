@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 
 type FormDataType = {
@@ -17,6 +17,13 @@ export default function ContactPage() {
     email: '',
     message: '',
   });
+
+  useEffect(() => {
+    const prefill = new URLSearchParams(window.location.search).get('message');
+    if (prefill) {
+      setFormData((prev) => ({ ...prev, message: prefill }));
+    }
+  }, []);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -63,10 +70,10 @@ export default function ContactPage() {
       
 
       {/* CONTACT FORM */}
-      <section className="py-24 bg-gradient-to-b from-slate-200 to-white">
+      <section className="py-24 bg-sky-50">
         <div className="w-full max-w-6xl mx-auto px-6 text-center">
-          <h1 className="text-4xl md:text-5xl font-extrabold text-sky-700 mb-4">
-            Contact Us
+          <h1 className="text-4xl md:text-5xl font-extrabold text-gray-800 mb-4">
+            Contact <span className="text-sky-600">Us</span>
           </h1>
 
           <p className="text-gray-500 mb-12">
@@ -143,7 +150,7 @@ export default function ContactPage() {
 
             <button
               type="submit"
-              className="w-full rounded-full bg-gradient-to-r from-sky-600 to-sky-800 py-4 text-white text-sm font-semibold shadow-md hover:opacity-90 transition"
+              className="w-full rounded-full bg-sky-600 py-4 text-white text-sm font-semibold shadow-md hover:bg-sky-700 transition"
             >
               Send Message
             </button>
@@ -152,10 +159,10 @@ export default function ContactPage() {
       </section>
 
       {/* MAP */}
-      <section className="py-2 bg-white">
+      <section className="py-20 bg-white">
         <div className="w-full max-w-6xl mx-auto px-6 text-center">
           <h2 className="text-4xl font-extrabold text-gray-800 mb-6">
-            Our <span className="text-sky-700">Location</span>
+            Our <span className="text-sky-600">Location</span>
           </h2>
 
           <iframe
@@ -172,7 +179,7 @@ export default function ContactPage() {
       {/* ===== CONTACT INFO ===== */}
         <section
           id="contact-info"
-          className="py-20 bg-gradient-to-br from-slate-200 via-white to-sky-50"
+          className="py-20 bg-sky-50"
         >
           <div className="container mx-auto px-6 max-w-4xl text-center">
 
