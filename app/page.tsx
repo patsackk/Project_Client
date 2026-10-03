@@ -70,7 +70,7 @@ useEffect(() => {
        {/* HERO TEXT */}
         <div className="absolute inset-0 z-10 flex items-center justify-center text-white text-center pointer-events-none">
           <div className="pointer-events-auto">
-            <h1 className="text-6xl font-extrabold">
+            <h1 className="text-4xl md:text-6xl font-bold">
               Find Your Dream <span className="text-sky-400">Home</span>
             </h1>
             <p className="mt-4 text-lg max-w-xl mx-auto">
@@ -82,12 +82,12 @@ useEffect(() => {
 
       {/* ===== WELCOME MESSAGE ===== */}
       {username && (
-        <section className="py-12 bg-gradient-to-r from-sky-600 to-slate-600">
+        <section className="py-12 bg-sky-700">
           <div className="container mx-auto text-center text-white">
-            <h2 className="text-4xl font-extrabold mb-4">
-              Welcome back, <span className="text-black">{username}</span>
+            <h2 className="text-3xl md:text-4xl font-bold mb-3">
+              Welcome back, <span className="text-sky-200">{username}</span>
             </h2>
-            <p className="text-xl font-light">
+            <p className="text-lg text-sky-100">
               We are glad to have you back with us.
             </p>
           </div>
@@ -95,17 +95,17 @@ useEffect(() => {
       )}
 
       {/* ===== SERVICES ===== */}
-      <section id="services" className="py-20 bg-slate-50">
-        <div className="container mx-auto text-center">
-          <h2 className="text-4xl font-extrabold text-gray-800 mb-6">
-            Our Services
+      <section id="services" className="py-20">
+        <div className="max-w-6xl mx-auto px-6 text-center">
+          <h2 className="section-title mb-10">
+            Our <span className="accent">Services</span>
           </h2>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {services.map((service) => (
               <div
                 key={service.id}
-                className="bg-white shadow-lg rounded-lg overflow-hidden transform hover:scale-105 transition"
+                className="card overflow-hidden transition hover:shadow-xl"
               >
                 <img
                   src={service.img}
@@ -113,13 +113,11 @@ useEffect(() => {
                   className="w-full h-56 object-cover"
                 />
                 <div className="p-6">
-                  <h3 className="text-2xl font-semibold text-gray-800">
+                  <h3 className="text-xl font-semibold text-gray-900">
                     {service.name}
                   </h3>
-                  <Link href={`/services/${service.id}`}>
-                    <button className="mt-4 px-6 py-2 bg-sky-900 text-white rounded-full hover:bg-gray-700">
-                      View Details
-                    </button>
+                  <Link href={`/services/${service.id}`} className="btn-primary mt-4">
+                    View Details
                   </Link>
                 </div>
               </div>
@@ -127,25 +125,6 @@ useEffect(() => {
           </div>
         </div>
       </section>
-
-      {/* ===== FOOTER ===== */}
-      <footer className="bg-gray-800 text-white py-8">
-        <div className="container mx-auto text-center">
-          <p className="text-gray-400">
-            &copy; 2024 UTO Advance Engineering. All rights reserved.
-          </p>
-
-          <div className="mt-4 flex justify-center space-x-6">
-            <a
-              href="https://www.instagram.com/uto_advance_engineering/"
-              className="text-gray-400 hover:text-sky-400 transition"
-            >
-              Instagram
-            </a>
-          </div>
-        </div>
-      </footer>
-
     </div>
   );
 }

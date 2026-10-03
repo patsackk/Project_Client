@@ -63,14 +63,9 @@ export default function TrackStatusPage() {
   }, []);
 
   const card = (children: React.ReactNode) => (
-    <main className="min-h-screen bg-gray-100 px-6 py-10">
-      <p className="max-w-3xl mx-auto text-gray-400 text-sm mb-4">
-        Client view for status
-      </p>
-      <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-sm p-8">
-        {children}
-      </div>
-    </main>
+    <div className="px-6 py-16">
+      <div className="card max-w-3xl mx-auto p-8 md:p-10">{children}</div>
+    </div>
   );
 
   if (loading) {
@@ -80,12 +75,9 @@ export default function TrackStatusPage() {
   if (!signedIn) {
     return card(
       <div className="text-center py-6">
-        <h1 className="text-xl font-bold text-gray-900 mb-2">Sign in to view your project status</h1>
+        <h1 className="section-title mb-2">Sign in to view your project status</h1>
         <p className="text-gray-500 mb-6">You need to be logged in to see updates for your project.</p>
-        <Link
-          href="/login"
-          className="inline-block px-6 py-2.5 rounded-full bg-sky-600 text-white font-semibold hover:bg-sky-700 transition"
-        >
+        <Link href="/login" className="btn-primary">
           Sign in
         </Link>
       </div>
@@ -93,13 +85,13 @@ export default function TrackStatusPage() {
   }
 
   if (error) {
-    return card(<p className="text-red-600">{error}</p>);
+    return card(<p className="alert-error">{error}</p>);
   }
 
   if (!data?.hasClient) {
     return card(
       <div className="text-center py-6">
-        <h1 className="text-xl font-bold text-gray-900 mb-2">No active project yet</h1>
+        <h1 className="section-title mb-2">No active project yet</h1>
         <p className="text-gray-500">
           Once you're assigned to a project, its status will show up here.
         </p>
@@ -113,7 +105,7 @@ export default function TrackStatusPage() {
     <>
       {/* Header */}
       <div className="flex items-center justify-between mb-1">
-        <h1 className="text-2xl font-bold text-gray-900">Project Status</h1>
+        <h1 className="section-title">Project Status</h1>
         <span
           className={`px-4 py-1 rounded-full border text-sm font-medium ${
             update ? statusBadge[update.status] ?? statusBadge['Not Started'] : statusBadge['Not Started']
@@ -203,7 +195,7 @@ export default function TrackStatusPage() {
       {/* Actions */}
       <Link
         href={`/contact?message=${encodeURIComponent(clarificationMessage(project, update))}`}
-        className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-sky-600 text-white font-semibold hover:bg-sky-700 transition"
+        className="btn-primary w-full py-3"
       >
         <MessageSquare size={18} />
         Contact Admin

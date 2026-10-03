@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import React, { useState, useEffect } from 'react';
 
 export default function AdminPropertiesPage() {
@@ -116,74 +115,51 @@ export default function AdminPropertiesPage() {
   };
 
   return (
-    <main className="min-h-screen bg-sky-50">
-      <header className="sticky top-0 bg-gradient-to-l from-sky-700 via-white shadow-lg py-6 z-50">
-        <div className="container mx-auto flex justify-between items-center">
-          <div className="flex items-center space-x-4">
-            <img src="/images/logo.png" alt="Logo" className="h-12 w-12 object-contain" />
-            <div className="text-2xl font-bold text-gray-800">UTO Advance</div>
-          </div>
-          <nav>
-            <ul className="flex space-x-6">
-              {['Home', 'About', 'Properties', 'Contact'].map((item) => (
-                <li key={item}>
-                  <Link
-                    href={item === 'Home' ? '/' : `/${item.toLowerCase()}`}
-                    className="text-gray-900 font-medium hover:text-slate-500 transition-all"
-                  >
-                    {item}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
-        </div>
-      </header>
-
-      <section className="container mx-auto py-10">
-        <h2 className="text-4xl font-semibold mb-6">Manage Properties</h2>
+    <div>
+      <section className="max-w-6xl mx-auto px-6 py-10">
+        <h1 className="page-title mb-6">Manage Properties</h1>
 
         {/* Error message */}
-        {error && <div className="bg-red-500 text-white p-2 mb-4">{error}</div>}
+        {error && <div className="alert-error mb-4">{error}</div>}
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="card p-8 space-y-5">
           {['name', 'location', 'description', 'img'].map((field) => (
             <div key={field}>
-              <label className="block">{field.charAt(0).toUpperCase() + field.slice(1)}:</label>
+              <label className="label">{field.charAt(0).toUpperCase() + field.slice(1)}</label>
               <input
                 type="text"
                 name={field}
                 value={formData[field]}
                 onChange={handleChange}
                 required
-                className="w-full p-2 border border-gray-300 rounded-md"
+                className="input"
               />
             </div>
           ))}
-          <button type="submit" className="bg-sky-600 text-white p-3 rounded-md">
+          <button type="submit" className="btn-primary">
             {editingProperty ? 'Update' : 'Add'} Property
           </button>
         </form>
 
         {/* Property List */}
-        <h3 className="text-3xl font-semibold mt-10">Property List</h3>
+        <h2 className="section-title mt-12">Property List</h2>
         <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {properties.map((property) => (
-            <div key={property.id} className="bg-white p-6 rounded-lg shadow-md border border-gray-300">
-              <h4 className="text-2xl font-semibold">{property.name}</h4>
+            <div key={property.id} className="card p-6">
+              <h3 className="text-xl font-semibold text-gray-900">{property.name}</h3>
               <p className="text-gray-500">{property.location}</p>
-              <p>{property.description}</p>
+              <p className="mt-2 text-gray-600">{property.description}</p>
               <div className="flex justify-between items-center mt-4">
                 <button
                   onClick={() => handleEdit(property)}
-                  className="bg-blue-500 text-white p-2 rounded-md"
+                  className="btn-secondary"
                 >
                   Edit
                 </button>
                 <button
                   onClick={() => handleDelete(property.id)}
-                  className="bg-red-500 text-white p-2 rounded-md"
+                  className="btn-danger"
                 >
                   Delete
                 </button>
@@ -192,6 +168,6 @@ export default function AdminPropertiesPage() {
           ))}
         </div>
       </section>
-    </main>
+    </div>
   );
 }

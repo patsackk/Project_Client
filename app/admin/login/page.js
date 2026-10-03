@@ -22,13 +22,13 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded-md shadow-md">
-        <h2 className="text-2xl font-semibold mb-6">Admin Login</h2>
-        {error && <div className="text-red-500 mb-4">{error}</div>}
+    <div className="flex items-center justify-center px-4 py-16">
+      <div className="card w-full max-w-md p-8">
+        <h1 className="page-title text-center mb-8">Admin Login</h1>
+        {error && <div className="alert-error mb-4">{error}</div>}
         <form onSubmit={handleLogin}>
-          <div className="mb-4">
-            <label htmlFor="password" className="block mb-2">
+          <div className="mb-5">
+            <label htmlFor="password" className="label">
               Password
             </label>
             <input
@@ -37,17 +37,17 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full p-2 border border-gray-300 rounded-md"
+              className="input"
             />
           </div>
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded-md"
+            className="btn-primary w-full py-3"
           >
             Login
           </button>
         </form>
       </div>
-    </main>
+    </div>
   );
 }

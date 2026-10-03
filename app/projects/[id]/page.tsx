@@ -2,6 +2,7 @@
 
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 
 export default function ProjectDetail() {
   const { id } = useParams();
@@ -92,48 +93,41 @@ export default function ProjectDetail() {
 
   const project = properties.find(p => p.id === id);
 
-  if (!project) return <div className="p-10">Project not found</div>;
+  if (!project) {
+    return (
+      <div className="max-w-6xl mx-auto px-6 py-20 text-center">
+        <h1 className="page-title">Project not found</h1>
+        <Link href="/projects" className="btn-primary mt-6">
+          Back to Projects
+        </Link>
+      </div>
+    );
+  }
 
   return (
-    <main className="min-h-screen bg-sky-50 p-6">
+    <div className="max-w-6xl mx-auto px-6 py-10">
+      <Link href="/projects" className="back-link">
+        <ArrowLeft size={16} />
+        Back to Projects
+      </Link>
 
-      <Link
-  href="/projects"
-  className="inline-flex items-center gap-1 px-3 py-1.5 
-             rounded-full text-sm font-medium
-             bg-sky-600 text-white
-             hover:bg-sky-700 
-             transition duration-200"
-        >
-        &lt; Back to projects
-        </Link>
+      <h1 className="page-title mt-6">{project.name}</h1>
+      <p className="text-gray-500 mt-1 mb-6">{project.location}</p>
 
+      <p className="mb-10 text-lg text-gray-600 leading-relaxed">{project.description}</p>
 
+      <h2 className="section-title mb-6">Gallery</h2>
 
-      <h1 className="text-3xl font-bold mt-4">{project.name}</h1>
-      <p className="text-gray-500 mb-6">{project.location}</p>
-
-      <p className="mb-8 text-gray-700">
-        {project.description}
-      </p>
-
-      <h2 className="text-2xl font-semibold text-gray-800 text-center mb-6">
-     - Gallery - 
-      </h2>
-
-
-      {/* Gallery */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 mb-10">
         {project.images.map((img, index) => (
           <img
             key={index}
             src={img}
-            alt="gallery"
-            className="rounded-xl shadow-sm object-cover w-full h-64"
+            alt={`${project.name} ${index + 1}`}
+            className="rounded-2xl shadow-sm object-cover w-full h-64"
           />
         ))}
       </div>
-
-    </main>
+    </div>
   );
 }

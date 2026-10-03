@@ -2,10 +2,10 @@ import Link from 'next/link';
 
 export default function PdpaPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-sky-100 via-white to-sky-200 px-4 py-12">
-      <div className="mx-auto max-w-3xl bg-white rounded-2xl shadow-xl p-8 space-y-6">
+    <div className="px-4 py-16">
+      <div className="card mx-auto max-w-3xl p-8 md:p-10 space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800">
+          <h1 className="page-title">
             Terms of Service &amp; PDPA Privacy Notice
           </h1>
           <p className="text-gray-500 mt-2 text-sm">
@@ -15,7 +15,7 @@ export default function PdpaPage() {
         </div>
 
         <section className="space-y-2">
-          <h2 className="text-lg font-semibold text-gray-800">
+          <h2 className="text-lg font-semibold text-gray-900">
             1. Terms of Service
           </h2>
           <p className="text-sm text-gray-600 leading-relaxed">
@@ -28,7 +28,7 @@ export default function PdpaPage() {
         </section>
 
         <section className="space-y-2">
-          <h2 className="text-lg font-semibold text-gray-800">
+          <h2 className="text-lg font-semibold text-gray-900">
             2. Personal Data We Collect
           </h2>
           <p className="text-sm text-gray-600 leading-relaxed">
@@ -40,7 +40,7 @@ export default function PdpaPage() {
         </section>
 
         <section className="space-y-2">
-          <h2 className="text-lg font-semibold text-gray-800">
+          <h2 className="text-lg font-semibold text-gray-900">
             3. Your Rights Under the PDPA
           </h2>
           <p className="text-sm text-gray-600 leading-relaxed">
@@ -54,7 +54,7 @@ export default function PdpaPage() {
         </section>
 
         <section className="space-y-2">
-          <h2 className="text-lg font-semibold text-gray-800">
+          <h2 className="text-lg font-semibold text-gray-900">
             4. Data Retention
           </h2>
           <p className="text-sm text-gray-600 leading-relaxed">
@@ -67,7 +67,7 @@ export default function PdpaPage() {
         <div className="pt-4">
           <Link
             href="/register"
-            className="inline-block rounded-full border border-sky-600 px-6 py-3 text-sky-700 text-sm font-medium hover:bg-sky-50 transition"
+            className="btn-secondary"
           >
             Back to Registration
           </Link>

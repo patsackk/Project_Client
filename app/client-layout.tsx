@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Sidebar from '@/components/Sidebar';
 import TopBar from '@/components/TopBar';
+import Footer from '@/components/Footer';
 import { Toaster } from "react-hot-toast";
 
 export default function ClientLayout({
@@ -29,6 +30,7 @@ export default function ClientLayout({
       >
         <TopBar sidebarOpen={sidebarOpen} onOpenSidebar={() => setSidebarOpen(true)} />
         <main className="flex-1">{children}</main>
+        <Footer />
       </div>
 
       <Toaster
