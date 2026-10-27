@@ -4,24 +4,28 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { PanelLeftClose } from 'lucide-react';
+import { useLanguage } from '@/components/LanguageProvider';
+import type { Translate } from '@/lib/i18n';
 
 type SidebarProps = {
   isOpen: boolean;
   onClose: () => void;
 };
 
-const menuItems = [
-  { label: 'Home', href: '/' },
-  { label: 'About', href: '/about' },
-  { label: 'Projects', href: '/projects' },
+const menuItems = (t: Translate) => [
+  { label: t('Home', 'หน้าแรก'), href: '/' },
+  { label: t('About', 'เกี่ยวกับเรา'), href: '/about' },
+  { label: t('Projects', 'ผลงาน'), href: '/projects' },
 ];
 
-const contactItem = { label: 'Contact', href: '/contact' };
-const trackItem = { label: 'Track Status', href: '/track' };
+const contactItem = (t: Translate) => ({ label: t('Contact', 'ติดต่อเรา'), href: '/contact' });
+const trackItem = (t: Translate) => ({ label: t('Track Status', 'ติดตามสถานะ'), href: '/track' });
+const messagesItem = (t: Translate) => ({ label: t('My Messages', 'ข้อความของฉัน'), href: '/messages' });
 
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const pathname = usePathname();
   const [username, setUsername] = useState<string | null>(null);
+  const { t } = useLanguage();
 
   //  sync login / logout real-time, same as TopBar
   useEffect(() => {
@@ -40,8 +44,8 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   }, []);
 
   const items = username
-    ? [...menuItems, trackItem, contactItem]
-    : [...menuItems, contactItem];
+    ? [...menuItems(t), trackItem(t), messagesItem(t), contactItem(t)]
+    : [...menuItems(t), contactItem(t)];
 
   return (
     <>
@@ -71,7 +75,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           <button
             onClick={onClose}
             className="shrink-0 w-8 h-8 flex items-center justify-center rounded-full hover:bg-sky-200/60 transition"
-            aria-label="Hide sidebar"
+            aria-label={t('Hide sidebar', 'ซ่อนแถบด้านข้าง')}
           >
             <PanelLeftClose size={18} />
           </button>
@@ -83,7 +87,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             const active = pathname === item.href;
             return (
               <Link
-                key={item.label}
+                key={item.href}
                 href={item.href}
                 onClick={() => {
                   if (window.innerWidth < 768) onClose();

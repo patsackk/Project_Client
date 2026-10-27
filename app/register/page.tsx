@@ -3,6 +3,7 @@
 import { useState, ChangeEvent, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useLanguage } from '@/components/LanguageProvider';
 
 type RegisterFormData = {
   name: string;
@@ -22,10 +23,12 @@ export default function RegisterPage() {
 });
 
   const [message, setMessage] = useState<string>('');
+  const [isSuccess, setIsSuccess] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [agreedToPolicy, setAgreedToPolicy] = useState<boolean>(false);
 
   const router = useRouter();
+  const { t } = useLanguage();
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -40,7 +43,11 @@ export default function RegisterPage() {
     e.preventDefault();
 
     if (!agreedToPolicy) {
-      setMessage('You must agree to the Terms of Service and PDPA Privacy Notice to continue.');
+      setIsSuccess(false);
+      setMessage(t(
+        'You must agree to the Terms of Service and PDPA Privacy Notice to continue.',
+        'กรุณายอมรับข้อกำหนดการใช้บริการและประกาศความเป็นส่วนตัว (PDPA) เพื่อดำเนินการต่อ'
+      ));
       return;
     }
 
@@ -56,8 +63,9 @@ export default function RegisterPage() {
 
       const data = await response.json();
 
+      setIsSuccess(response.ok);
       if (response.ok) {
-        setMessage('Registration successful!');
+        setMessage(t('Registration successful!', 'สมัครสมาชิกสำเร็จ!'));
         setFormData({
               name: '',
               email: '',
@@ -67,11 +75,12 @@ export default function RegisterPage() {
             });
         setAgreedToPolicy(false);
       } else {
-        setMessage(data.message || 'Registration failed.');
+        setMessage(data.message || t('Registration failed.', 'สมัครสมาชิกไม่สำเร็จ'));
       }
     } catch (error) {
       console.error('Error during registration:', error);
-      setMessage('An unexpected error occurred.');
+      setIsSuccess(false);
+      setMessage(t('An unexpected error occurred.', 'เกิดข้อผิดพลาดที่ไม่คาดคิด'));
     } finally {
       setIsLoading(false);
     }
@@ -88,17 +97,20 @@ export default function RegisterPage() {
       {/* Title */}
       <div className="text-center mb-8">
         <h1 className="page-title">
-          Create Account 
+          {t('Create Account', 'สร้างบัญชี')}
         </h1>
         <p className="text-gray-500 mt-2 text-sm">
-          Join <span className="font-semibold">UTO Advance</span> today
+          {t(
+            <>Join <span className="font-semibold">UTO Advance</span> today</>,
+            <>เข้าร่วมกับ <span className="font-semibold">UTO Advance</span> วันนี้</>
+          )}
         </p>
       </div>
 
       {/* Message */}
       {message && (
         <div
-          className={`mb-5 ${message.includes('successful') ? 'alert-success' : 'alert-error'}`}
+          className={`mb-5 ${isSuccess ? 'alert-success' : 'alert-error'}`}
         >
           {message}
         </div>
@@ -110,14 +122,14 @@ export default function RegisterPage() {
         {/* Name */}
         <div>
           <label className="label">
-            Full Name
+            {t('Full Name', 'ชื่อ-นามสกุล')}
           </label>
           <input
             type="text"
             name="name"
             value={formData.name}
             onChange={handleChange}
-            placeholder="Your name"
+            placeholder={t('Your name', 'ชื่อของคุณ')}
             required
             className="input"
           />
@@ -126,7 +138,7 @@ export default function RegisterPage() {
         {/* Email */}
         <div>
           <label className="label">
-            Email
+            {t('Email', 'อีเมล')}
           </label>
           <input
             type="email"
@@ -142,14 +154,14 @@ export default function RegisterPage() {
         {/* Phone */}
           <div>
             <label className="label">
-              Phone
+              {t('Phone', 'เบอร์โทรศัพท์')}
             </label>
             <input
               type="text"
               name="phone"
               value={formData.phone}
               onChange={handleChange}
-              placeholder="Your phone number"
+              placeholder={t('Your phone number', 'เบอร์โทรศัพท์ของคุณ')}
               className="input"
             />
           </div>
@@ -157,14 +169,14 @@ export default function RegisterPage() {
           {/* Address */}
           <div>
             <label className="label">
-              Address
+              {t('Address', 'ที่อยู่')}
             </label>
             <input
               type="text"
               name="address"
               value={formData.address}
               onChange={handleChange}
-              placeholder="Your address"
+              placeholder={t('Your address', 'ที่อยู่ของคุณ')}
               className="input"
             />
           </div>
@@ -172,7 +184,7 @@ export default function RegisterPage() {
         {/* Password */}
         <div>
           <label className="label">
-            Password
+            {t('Password', 'รหัสผ่าน')}
           </label>
           <input
             type="password"
@@ -197,11 +209,11 @@ export default function RegisterPage() {
             className="mt-0.5 h-4 w-4 rounded border-gray-300 text-sky-600 focus:ring-sky-500"
           />
           <label htmlFor="agreedToPolicy" className="text-xs text-gray-600 leading-relaxed">
-            I have read and agree to the{' '}
+            {t('I have read and agree to the ', 'ข้าพเจ้าได้อ่านและยอมรับ')}
             <Link href="/pdpa" target="_blank" className="text-sky-700 underline hover:text-sky-800">
-              Terms of Service and PDPA Privacy Notice
+              {t('Terms of Service and PDPA Privacy Notice', 'ข้อกำหนดการใช้บริการและประกาศความเป็นส่วนตัว (PDPA)')}
             </Link>
-            .
+            {t('.', '')}
           </label>
         </div>
 
@@ -212,7 +224,7 @@ export default function RegisterPage() {
             disabled={isLoading || !agreedToPolicy}
             className="btn-primary w-full py-3"
           >
-            {isLoading ? 'Signing up...' : 'Sign Up'}
+            {isLoading ? t('Signing up...', 'กำลังสมัครสมาชิก...') : t('Sign Up', 'สมัครสมาชิก')}
           </button>
 
           <button
@@ -220,7 +232,7 @@ export default function RegisterPage() {
             onClick={handleBackToHome}
             className="btn-secondary w-full py-3"
           >
-            Back to Home
+            {t('Back to Home', 'กลับหน้าแรก')}
           </button>
         </div>
       </form>

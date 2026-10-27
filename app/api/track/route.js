@@ -1,23 +1,26 @@
 import { PrismaClient } from '@prisma/client';
+import { getT } from '@/lib/i18n-server';
 import jwt from 'jsonwebtoken';
 import { NextResponse } from 'next/server';
 
 const prisma = new PrismaClient();
 
 export async function GET(req) {
+  const t = await getT();
+
   try {
     const authHeader = req.headers.get('authorization') || '';
     const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
 
     if (!token) {
-      return NextResponse.json({ message: 'Not authenticated.' }, { status: 401 });
+      return NextResponse.json({ message: t('Not authenticated.', 'กรุณาเข้าสู่ระบบ') }, { status: 401 });
     }
 
     let payload;
     try {
       payload = jwt.verify(token, process.env.JWT_SECRET || 'default_secret_key');
     } catch {
-      return NextResponse.json({ message: 'Invalid or expired session.' }, { status: 401 });
+      return NextResponse.json({ message: t('Invalid or expired session.', 'เซสชันไม่ถูกต้องหรือหมดอายุ กรุณาเข้าสู่ระบบใหม่') }, { status: 401 });
     }
 
     const client = await prisma.client.findUnique({
@@ -53,7 +56,7 @@ export async function GET(req) {
     });
   } catch (error) {
     console.error('Error fetching track status:', error);
-    return NextResponse.json({ message: 'An error occurred.', error: error.message }, { status: 500 });
+    return NextResponse.json({ message: t('An error occurred.', 'เกิดข้อผิดพลาด'), error: error.message }, { status: 500 });
   } finally {
     await prisma.$disconnect();
   }

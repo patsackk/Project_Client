@@ -4,6 +4,9 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import { PanelLeftOpen } from 'lucide-react';
+import NotificationBell from '@/components/NotificationBell';
+import LanguageToggle from '@/components/LanguageToggle';
+import { useLanguage } from '@/components/LanguageProvider';
 
 type TopBarProps = {
   sidebarOpen: boolean;
@@ -12,6 +15,7 @@ type TopBarProps = {
 
 export default function TopBar({ sidebarOpen, onOpenSidebar }: TopBarProps) {
   const [username, setUsername] = useState<string | null>(null);
+  const { t } = useLanguage();
 
   //  sync login / logout real-time
   useEffect(() => {
@@ -35,7 +39,7 @@ export default function TopBar({ sidebarOpen, onOpenSidebar }: TopBarProps) {
 
     window.dispatchEvent(new Event('storage'));
 
-    toast.success('Logged out successfully!');
+    toast.success(t('Logged out successfully!', 'ออกจากระบบเรียบร้อยแล้ว'));
   };
 
   return (
@@ -45,7 +49,7 @@ export default function TopBar({ sidebarOpen, onOpenSidebar }: TopBarProps) {
           <button
             onClick={onOpenSidebar}
             className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-sky-100 transition"
-            aria-label="Show sidebar"
+            aria-label={t('Show sidebar', 'แสดงแถบด้านข้าง')}
           >
             <PanelLeftOpen size={18} />
           </button>
@@ -55,26 +59,31 @@ export default function TopBar({ sidebarOpen, onOpenSidebar }: TopBarProps) {
 
       {!username ? (
         <div className="flex items-center gap-2">
+          <LanguageToggle />
           <Link
             href="/login"
             className="btn-secondary px-4 py-1.5"
           >
-            Sign in
+            {t('Sign in', 'เข้าสู่ระบบ')}
           </Link>
           <Link
             href="/register"
             className="btn-primary px-4 py-1.5"
           >
-            Sign up
+            {t('Sign up', 'สมัครสมาชิก')}
           </Link>
         </div>
       ) : (
-        <button
-          onClick={handleLogout}
-          className="btn-danger px-4 py-1.5"
-        >
-          Logout
-        </button>
+        <div className="flex items-center gap-3">
+          <LanguageToggle />
+          <NotificationBell />
+          <button
+            onClick={handleLogout}
+            className="btn-danger px-4 py-1.5"
+          >
+            {t('Logout', 'ออกจากระบบ')}
+          </button>
+        </div>
       )}
     </div>
   );

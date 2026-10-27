@@ -1,9 +1,12 @@
 import { PrismaClient } from '@prisma/client';
+import { getT } from '@/lib/i18n-server';
 import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
 export async function POST(req) {
+  const t = await getT();
+
   try {
     // Log request information for debugging
     console.log('Incoming POST request');
@@ -13,7 +16,7 @@ export async function POST(req) {
     // Basic validation
     if (!name || !email || !phone || !address || !password) {
   return new Response(
-    JSON.stringify({ message: 'All fields are required.' }),
+    JSON.stringify({ message: t('All fields are required.', 'กรุณากรอกข้อมูลให้ครบทุกช่อง') }),
     { status: 400, headers: { 'Content-Type': 'application/json' } }
   );
 }
@@ -22,7 +25,7 @@ export async function POST(req) {
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailPattern.test(email)) {
       return new Response(
-        JSON.stringify({ message: 'Invalid email format.' }),
+        JSON.stringify({ message: t('Invalid email format.', 'รูปแบบอีเมลไม่ถูกต้อง') }),
         { status: 400, headers: { 'Content-Type': 'application/json' } }
       );
     }
@@ -34,7 +37,7 @@ export async function POST(req) {
 
     if (existingUser) {
       return new Response(
-        JSON.stringify({ message: 'Email is already taken.' }),
+        JSON.stringify({ message: t('Email is already taken.', 'อีเมลนี้ถูกใช้งานแล้ว') }),
         { status: 400, headers: { 'Content-Type': 'application/json' } }
       );
     }
@@ -56,14 +59,14 @@ export async function POST(req) {
     // Respond with success
     console.log('User created successfully:', user);
     return new Response(
-      JSON.stringify({ message: 'User registered successfully!', user }),
+      JSON.stringify({ message: t('User registered successfully!', 'สมัครสมาชิกสำเร็จ!'), user }),
       { status: 201, headers: { 'Content-Type': 'application/json' } }
     );
   } catch (error) {
     console.error('Error during registration:', error);
     return new Response(
       JSON.stringify({
-        message: 'An error occurred while registering the user.',
+        message: t('An error occurred while registering the user.', 'เกิดข้อผิดพลาดระหว่างการสมัครสมาชิก'),
         error: error.message,
       }),
       { status: 500, headers: { 'Content-Type': 'application/json' } }
