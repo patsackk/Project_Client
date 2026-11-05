@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { Mail, MapPin, Phone } from 'lucide-react';
 import { useLanguage } from '@/components/LanguageProvider';
+import { clearLogin } from '@/lib/session';
 
 type FormDataType = {
   name: string;
@@ -32,7 +33,10 @@ export default function ContactPage() {
     const token = localStorage.getItem('token');
     if (!token) return;
     fetch('/api/messages', { headers: { Authorization: `Bearer ${token}` } })
-      .then((res) => (res.ok ? res.json() : null))
+      .then((res) => {
+        if (res.status === 401) clearLogin();
+        return res.ok ? res.json() : null;
+      })
       .then((data) => {
         if (!data?.user) return;
         setFormData((prev) => ({

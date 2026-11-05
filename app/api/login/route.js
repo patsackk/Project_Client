@@ -48,7 +48,9 @@ export async function POST(req) {
     const token = jwt.sign(
       { userId: user.id },
       process.env.JWT_SECRET || 'default_secret_key',
-      { expiresIn: '1h' }
+      // Clients stay logged in for a week; when it runs out, the site signs
+      // them out and asks them to log in again (lib/session.ts).
+      { expiresIn: '7d' }
     );
 
     // Return success response with the token

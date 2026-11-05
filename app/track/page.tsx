@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Clock, MessageSquare } from 'lucide-react';
 import { useLanguage } from '@/components/LanguageProvider';
+import { clearLogin } from '@/lib/session';
 import type { Translate } from '@/lib/i18n';
 
 const ADMIN_ORIGIN = process.env.NEXT_PUBLIC_ADMIN_ORIGIN || '';
@@ -56,6 +57,7 @@ function clarificationMessage(
 
 export default function TrackStatusPage() {
   const [signedIn, setSignedIn] = useState(true);
+  const [expired, setExpired] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<TrackResponse | null>(null);
@@ -73,11 +75,18 @@ export default function TrackStatusPage() {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then(async (res) => {
+        if (res.status === 401) {
+          // Login ran out: sign out and ask them to log in again.
+          clearLogin();
+          setExpired(true);
+          setSignedIn(false);
+          return null;
+        }
         const json = await res.json();
         if (!res.ok) throw new Error(json.message || t('Failed to load status.', 'โหลดสถานะไม่สำเร็จ'));
         return json as TrackResponse;
       })
-      .then(setData)
+      .then((json) => json && setData(json))
       .catch((err: Error) => setError(err.message))
       .finally(() => setLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps -- load once; `t` only affects the fallback error text
@@ -97,7 +106,11 @@ export default function TrackStatusPage() {
     return card(
       <div className="text-center py-6">
         <h1 className="section-title mb-2">{t('Sign in to view your project status', 'เข้าสู่ระบบเพื่อดูสถานะโครงการของคุณ')}</h1>
-        <p className="text-gray-500 mb-6">{t('You need to be logged in to see updates for your project.', 'คุณต้องเข้าสู่ระบบก่อนจึงจะดูความคืบหน้าของโครงการได้')}</p>
+        <p className="text-gray-500 mb-6">
+          {expired
+            ? t('Your login has expired. Please sign in again.', 'การเข้าสู่ระบบหมดอายุแล้ว กรุณาเข้าสู่ระบบอีกครั้ง')
+            : t('You need to be logged in to see updates for your project.', 'คุณต้องเข้าสู่ระบบก่อนจึงจะดูความคืบหน้าของโครงการได้')}
+        </p>
         <Link href="/login" className="btn-primary">
           {t('Sign in', 'เข้าสู่ระบบ')}
         </Link>

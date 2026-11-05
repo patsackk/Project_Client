@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Plus, Reply } from 'lucide-react';
 import { useLanguage } from '@/components/LanguageProvider';
+import { clearLogin } from '@/lib/session';
 
 type ContactMessage = {
   id: number;
@@ -18,6 +19,7 @@ const formatDate = (date: string, locale: string) =>
 
 export default function MyMessagesPage() {
   const [signedIn, setSignedIn] = useState(true);
+  const [expired, setExpired] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [messages, setMessages] = useState<ContactMessage[]>([]);
@@ -37,11 +39,18 @@ export default function MyMessagesPage() {
       cache: 'no-store',
     })
       .then(async (res) => {
+        if (res.status === 401) {
+          // Login ran out: sign out and ask them to log in again.
+          clearLogin();
+          setExpired(true);
+          setSignedIn(false);
+          return null;
+        }
         const json = await res.json();
         if (!res.ok) throw new Error(json.message || t('Failed to load messages.', 'โหลดข้อความไม่สำเร็จ'));
         return json;
       })
-      .then((data) => setMessages(data.messages))
+      .then((data) => data && setMessages(data.messages))
       .catch((err: Error) => setError(err.message))
       .finally(() => setLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps -- load once; `t` only affects the fallback error text
@@ -78,7 +87,11 @@ export default function MyMessagesPage() {
     return card(
       <div className="text-center py-6">
         <h1 className="section-title mb-2">{t('Sign in to view your messages', 'เข้าสู่ระบบเพื่อดูข้อความของคุณ')}</h1>
-        <p className="text-gray-500 mb-6">{t('You need to be logged in to see your messages and replies.', 'คุณต้องเข้าสู่ระบบก่อนจึงจะดูข้อความและการตอบกลับได้')}</p>
+        <p className="text-gray-500 mb-6">
+          {expired
+            ? t('Your login has expired. Please sign in again.', 'การเข้าสู่ระบบหมดอายุแล้ว กรุณาเข้าสู่ระบบอีกครั้ง')
+            : t('You need to be logged in to see your messages and replies.', 'คุณต้องเข้าสู่ระบบก่อนจึงจะดูข้อความและการตอบกลับได้')}
+        </p>
         <Link href="/login" className="btn-primary">
           {t('Sign in', 'เข้าสู่ระบบ')}
         </Link>

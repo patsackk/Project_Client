@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { PanelLeftClose } from 'lucide-react';
 import { useLanguage } from '@/components/LanguageProvider';
+import Tooltip from '@/components/Tooltip';
 import type { Translate } from '@/lib/i18n';
 
 type SidebarProps = {
@@ -14,8 +15,8 @@ type SidebarProps = {
 
 const menuItems = (t: Translate) => [
   { label: t('Home', 'หน้าแรก'), href: '/' },
-  { label: t('About', 'เกี่ยวกับเรา'), href: '/about' },
   { label: t('Projects', 'ผลงาน'), href: '/projects' },
+  { label: t('About', 'เกี่ยวกับเรา'), href: '/about' },
 ];
 
 const contactItem = (t: Translate) => ({ label: t('Contact', 'ติดต่อเรา'), href: '/contact' });
@@ -43,9 +44,12 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
     };
   }, []);
 
+  // Visitors mostly want to see our work; a logged-in client mostly comes
+  // back to check their own project or a reply, so those go right under Home.
+  const [home, ...rest] = menuItems(t);
   const items = username
-    ? [...menuItems(t), trackItem(t), messagesItem(t), contactItem(t)]
-    : [...menuItems(t), contactItem(t)];
+    ? [home, trackItem(t), messagesItem(t), ...rest, contactItem(t)]
+    : [home, ...rest, contactItem(t)];
 
   return (
     <>
@@ -72,13 +76,15 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
               UTO Advance
             </span>
           </div>
-          <button
-            onClick={onClose}
-            className="shrink-0 w-8 h-8 flex items-center justify-center rounded-full hover:bg-sky-200/60 transition"
-            aria-label={t('Hide sidebar', 'ซ่อนแถบด้านข้าง')}
-          >
-            <PanelLeftClose size={18} />
-          </button>
+          <Tooltip label={t('Hide sidebar', 'ซ่อนแถบด้านข้าง')} side="bottom">
+            <button
+              onClick={onClose}
+              className="shrink-0 w-8 h-8 flex items-center justify-center rounded-full hover:bg-sky-200/60 transition"
+              aria-label={t('Hide sidebar', 'ซ่อนแถบด้านข้าง')}
+            >
+              <PanelLeftClose size={18} />
+            </button>
+          </Tooltip>
         </div>
 
         {/* Nav links */}
