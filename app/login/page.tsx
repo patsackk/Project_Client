@@ -46,7 +46,6 @@ export default function Login() {
       if (response.ok) {
         setSuccess(t('Login successful!', 'เข้าสู่ระบบสำเร็จ!'));
         setError('');
-        console.log('Logged in user:', data.user);
         
         localStorage.setItem('token', data.token);
         localStorage.setItem('username', data.user.name);

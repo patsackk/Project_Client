@@ -1,78 +1,59 @@
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 import { getT } from '@/lib/i18n-server';
 import bcrypt from 'bcryptjs';
-
-const prisma = new PrismaClient();
+import { NextResponse } from 'next/server';
 
 export async function POST(req) {
   const t = await getT();
 
   try {
-    // Log request information for debugging
-    console.log('Incoming POST request');
-
-    // Parse the JSON body
     const { name, email, phone, address, password } = await req.json();
-    // Basic validation
-    if (!name || !email || !phone || !address || !password) {
-  return new Response(
-    JSON.stringify({ message: t('All fields are required.', 'กรุณากรอกข้อมูลให้ครบทุกช่อง') }),
-    { status: 400, headers: { 'Content-Type': 'application/json' } }
-  );
-}
 
-    // Validate email format
+    if (!name || !email || !phone || !address || !password) {
+      return NextResponse.json(
+        { message: t('All fields are required.', 'กรุณากรอกข้อมูลให้ครบทุกช่อง') },
+        { status: 400 }
+      );
+    }
+
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailPattern.test(email)) {
-      return new Response(
-        JSON.stringify({ message: t('Invalid email format.', 'รูปแบบอีเมลไม่ถูกต้อง') }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      return NextResponse.json(
+        { message: t('Invalid email format.', 'รูปแบบอีเมลไม่ถูกต้อง') },
+        { status: 400 }
       );
     }
 
-    // Check if the email already exists
-    const existingUser = await prisma.user.findUnique({
-      where: { email },
-    });
+    const existingUser = await prisma.user.findUnique({ where: { email } });
 
     if (existingUser) {
-      return new Response(
-        JSON.stringify({ message: t('Email is already taken.', 'อีเมลนี้ถูกใช้งานแล้ว') }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      return NextResponse.json(
+        { message: t('Email is already taken.', 'อีเมลนี้ถูกใช้งานแล้ว') },
+        { status: 400 }
       );
     }
 
-    // Hash the password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Create the user in the database
+    // role is always the schema default ("client") — never taken from the form.
     const user = await prisma.user.create({
       data: {
         name,
         email,
         phone,
         address,
-        password: hashedPassword,
+        password: await bcrypt.hash(password, 10),
       },
+      select: { id: true, name: true, email: true },
     });
 
-    // Respond with success
-    console.log('User created successfully:', user);
-    return new Response(
-      JSON.stringify({ message: t('User registered successfully!', 'สมัครสมาชิกสำเร็จ!'), user }),
-      { status: 201, headers: { 'Content-Type': 'application/json' } }
+    return NextResponse.json(
+      { message: t('User registered successfully!', 'สมัครสมาชิกสำเร็จ!'), user },
+      { status: 201 }
     );
   } catch (error) {
     console.error('Error during registration:', error);
-    return new Response(
-      JSON.stringify({
-        message: t('An error occurred while registering the user.', 'เกิดข้อผิดพลาดระหว่างการสมัครสมาชิก'),
-        error: error.message,
-      }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
+    return NextResponse.json(
+      { message: t('An error occurred while registering the user.', 'เกิดข้อผิดพลาดระหว่างการสมัครสมาชิก') },
+      { status: 500 }
     );
-  } finally {
-    // Disconnect Prisma client
-    await prisma.$disconnect();
   }
 }

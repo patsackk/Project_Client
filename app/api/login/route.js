@@ -1,19 +1,15 @@
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 import { getT } from '@/lib/i18n-server';
+import { signLoginToken } from '@/lib/auth';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken'; // Optional for token-based authentication
 import { NextResponse } from 'next/server';
-
-const prisma = new PrismaClient();
 
 export async function POST(req) {
   const t = await getT();
 
   try {
-    // Parse the request body
     const { email, password } = await req.json();
 
-    // Validate the input
     if (!email || !password) {
       return NextResponse.json(
         { message: t('Email and password are required.', 'กรุณากรอกอีเมลและรหัสผ่าน') },
@@ -21,12 +17,12 @@ export async function POST(req) {
       );
     }
 
-    // Find the user by email
+    // The password hash is hidden by default (lib/prisma.ts) — ask for it here only.
     const user = await prisma.user.findUnique({
       where: { email },
+      omit: { password: false },
     });
 
-    // Check if the user exists
     if (!user) {
       return NextResponse.json(
         { message: t('Invalid email or password.', 'อีเมลหรือรหัสผ่านไม่ถูกต้อง') },
@@ -34,7 +30,20 @@ export async function POST(req) {
       );
     }
 
-    // Compare the provided password with the hashed password
+    // Contacts the team added on the admin site have no password, so they
+    // can't sign in here until one is set for them.
+    if (!user.password) {
+      return NextResponse.json(
+        {
+          message: t(
+            'This account was set up by our team and has no password yet. Please contact us to get access.',
+            'บัญชีนี้สร้างโดยทีมงานและยังไม่มีรหัสผ่าน กรุณาติดต่อเราเพื่อขอเข้าใช้งาน'
+          ),
+        },
+        { status: 401 }
+      );
+    }
+
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
@@ -44,28 +53,19 @@ export async function POST(req) {
       );
     }
 
-    // Optional: Generate a JWT token
-    const token = jwt.sign(
-      { userId: user.id },
-      process.env.JWT_SECRET || 'default_secret_key',
-      // Clients stay logged in for a week; when it runs out, the site signs
-      // them out and asks them to log in again (lib/session.ts).
-      { expiresIn: '7d' }
-    );
-
-    // Return success response with the token
     return NextResponse.json(
-      { message: t('Login successful!', 'เข้าสู่ระบบสำเร็จ!'), token, user },
+      {
+        message: t('Login successful!', 'เข้าสู่ระบบสำเร็จ!'),
+        token: signLoginToken(user.id),
+        user: { id: user.id, name: user.name, email: user.email },
+      },
       { status: 200 }
     );
-    
   } catch (error) {
     console.error('Error during login:', error);
     return NextResponse.json(
-      { message: t('An error occurred during login.', 'เกิดข้อผิดพลาดระหว่างการเข้าสู่ระบบ'), error: error.message },
+      { message: t('An error occurred during login.', 'เกิดข้อผิดพลาดระหว่างการเข้าสู่ระบบ') },
       { status: 500 }
     );
-  } finally {
-    await prisma.$disconnect(); // Disconnect Prisma client after the operation
   }
 }

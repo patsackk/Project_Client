@@ -1,57 +1,40 @@
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
+import { getT } from '@/lib/i18n-server';
+import { NextResponse } from 'next/server';
 
-const prisma = new PrismaClient();
-
+// The public contact form. Admins read and reply on the admin site.
 export async function POST(req) {
+  const t = await getT();
+
   try {
-    // Log incoming request body to verify it's being sent correctly
-    console.log('Received body:', req.body);
+    const { name, email, phone, message } = await req.json();
 
-    // Parse the incoming JSON request body
-    const { name, email, message } = await req.json();
-
-    // Validate input
     if (!name || !email || !message) {
-      return new Response(
-        JSON.stringify({ message: 'All fields are required.' }),
+      return NextResponse.json(
+        { message: t('All fields are required.', 'กรุณากรอกข้อมูลให้ครบทุกช่อง') },
         { status: 400 }
       );
     }
 
-    // Validate email format
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailPattern.test(email)) {
-      console.error('Invalid email format:', email);
-      return new Response(
-        JSON.stringify({ message: 'Invalid email format.' }),
+      return NextResponse.json(
+        { message: t('Invalid email format.', 'รูปแบบอีเมลไม่ถูกต้อง') },
         { status: 400 }
       );
     }
 
-    // Create the contact form entry
     const contactForm = await prisma.contactForm.create({
-      data: {
-        name,
-        email,
-        message,
-      },
+      data: { name, email, phone: phone || null, message },
+      select: { id: true },
     });
 
-    return new Response(JSON.stringify(contactForm), { status: 201 });
+    return NextResponse.json(contactForm, { status: 201 });
   } catch (error) {
-    // Check if error is an instance of Error and log accordingly
-    if (error instanceof Error) {
-      console.error('Error creating contact form:', error.message, error.stack);
-    } else {
-      console.error('Unknown error:', error);
-    }
-
-    return new Response(
-      JSON.stringify({ message: 'An error occurred while submitting the form.' }),
+    console.error('Error creating contact form:', error);
+    return NextResponse.json(
+      { message: t('An error occurred while submitting the form.', 'เกิดข้อผิดพลาดระหว่างการส่งข้อความ') },
       { status: 500 }
     );
-  } finally {
-    // Disconnect Prisma Client
-    await prisma.$disconnect();
   }
 }
