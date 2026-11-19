@@ -1,17 +1,12 @@
 import { prisma } from './prisma';
 import type { Lang } from './i18n';
+import { assetUrl } from './asset-url';
+
+export { assetUrl };
 
 // Website content (projects, services, home slider) is managed from the admin
 // dashboard and stored in the shared database. See the admin app's
 // app/content page.
-
-const ADMIN_ORIGIN = process.env.NEXT_PUBLIC_ADMIN_ORIGIN || '';
-
-// "/images/..." ships with this app; "/uploads/..." was uploaded through the
-// admin dashboard and is served by the admin app.
-export function assetUrl(src: string) {
-  return src.startsWith('/uploads/') ? `${ADMIN_ORIGIN}${src}` : src;
-}
 
 // Thai falls back to English when an admin hasn't filled in the Thai field.
 const pick = (lang: Lang, en: string, th: string) => (lang === 'th' && th ? th : en);

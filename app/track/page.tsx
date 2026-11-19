@@ -6,8 +6,8 @@ import { Clock, MessageSquare } from 'lucide-react';
 import { useLanguage } from '@/components/LanguageProvider';
 import { clearLogin } from '@/lib/session';
 import type { Translate } from '@/lib/i18n';
+import { assetUrl } from '@/lib/asset-url';
 
-const ADMIN_ORIGIN = process.env.NEXT_PUBLIC_ADMIN_ORIGIN || '';
 
 const statusBadge: Record<string, string> = {
   'Not Started': 'border-gray-300 bg-gray-50 text-gray-700',
@@ -213,13 +213,13 @@ export default function TrackStatusPage() {
             {update.photos.map((photo) => (
               <a
                 key={photo}
-                href={`${ADMIN_ORIGIN}${photo}`}
+                href={assetUrl(photo)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block aspect-square rounded-xl overflow-hidden border border-gray-200"
               >
                 <img
-                  src={`${ADMIN_ORIGIN}${photo}`}
+                  src={assetUrl(photo)}
                   alt={t('Progress', 'ความคืบหน้า')}
                   className="w-full h-full object-cover"
                 />
